@@ -1,0 +1,160 @@
+---
+title: "great_wine_project"
+author: "Henry Oamen"
+date: "01/06/2024"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# The Great Wine Company
+
+Wine is all about people. We are a company run by wine people. We offer free UK delivery on orders over £500 and 10% off orders of 120+ bottles. We list over 130k wines from over 130 fabulous winemakers across the world in more than 44 countries. We know each of our producers personally. We want to continue to enjoy monopoly and expand into other countries where we are not yet dominant. We now require an analyst to help provide insight into our business. We would like to know which countries produce the finest quality wine (we rate high quality wine as wine with points equal or above 90). Which of our products is the most expensive and which producer makes this. Which products should we not supply anymore, with points less than 45. Please provide a report for the next meeting with the programme director, include some beautiful graphs 
+
+
+## Loading necessary packages
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+library(readxl)
+```
+## Reading in our data
+
+```{r}
+data <- read_csv("winemag-data-130k-v2.csv", na = "")
+```
+
+```{r}
+view(data)
+```
+## Exploring our data
+
+```{r}
+glimpse(data)
+```
+
+
+```{r}
+colnames(data)
+```
+
+```{r}
+head(data)
+```
+
+
+
+```{r}
+# to check if there are NaN values in the dataset
+
+any(is.na(data))
+```
+
+
+## Filtering required dataset to exclude NaN values
+
+```{r}
+filtered_data <- filter(data, country!='NA' & points!='NA' & price!='NA' & province!='NA' & designation != 'NA') # we can exclude the rows with NaN
+
+view(filtered_data)
+```
+
+### 1. To determine which country produced the finest quality wine based on points
+
+```{r}
+# select desired columns
+country_points <- filtered_data[c('country', 'points', 'price')] # we extract the columns of interest from the filtered data
+
+country_points
+```
+
+
+```{r}
+# plot a graph to see the distribution of the points for each country
+
+ggplot(country_points, aes(country, points)) + geom_boxplot() + theme_bw() + theme(plot.title = element_text(hjust = 0.5, colour = "steelblue", face = "bold"), axis.text.x = element_text(size = 8, colour = "black", angle = 40, vjust = 1, hjust = 1)) + labs(title = "Wine Points vs Country of production", x = "Country of production", y = "Points")
+```
+
+
+
+```{r}
+# we group by country, select the rows having max points for each country and further filter based on the criteria for quality wine 
+
+quality_data <- country_points %>% group_by(country) %>% slice(which.max(points)) %>% filter(points >= 90) 
+
+quality_data
+```
+```{r}
+# we can plot the graph of the countries with the highest quality of wine
+ggplot(quality_data, aes(country, points, size = price)) + geom_point() + theme_bw() + theme(plot.title = element_text(hjust = 0.5, colour = "red", face = "bold"), axis.text.x = element_text(size = 10, colour = "black", angle = 40, vjust = 1, hjust = 1)) + labs(title = "Highest points vs Country of production", x = "Country of production", y = "Points")
+```
+
+
+```{r}
+# data sorted in descending order to quickly see the countries with the highest points among the producers that meet the criteria
+
+ordered_max <- quality_data[order(-quality_data$points), ] 
+```
+
+Australia, France, Italy Portugal and US make the best quality wine.
+
+
+```{r}
+install.packages("pacman")
+```
+
+we can present our data in a table
+```{r}
+library(flextable)
+```
+```{r}
+flextable::flextable(ordered_max)
+
+```
+
+```{r}
+# we can present the data for countries producing the best quality wines also as table
+
+best_quality <- filter(ordered_max, points == 100)
+flextable::flextable(best_quality)
+```
+
+
+
+```{r}
+cor(country_points$points, country_points$price) # The quality of wine shows some moderate correlation with the price but not a perfect relationship.
+```
+
+
+### 2. To determine which products is the most expensive and which producer makes this
+
+```{r}
+# we select the desired columns and slice to obtain the most expensive wine
+
+wine_prod <- filtered_data[c('country', 'designation', 'price', 'points')] %>% slice(which.max(price))
+
+wine_prod[order(-wine_prod$price), ]
+```
+The most expensive product is Roger Rose Vineyard which is made in the US.
+
+
+### 3. To determine products which should not be supplied anymore based on a benchmark of >=45 points
+
+
+```{r}
+products_filtered <- 
+  filtered_data [c('designation', 'points')] %>% 
+  filter(points <= 45)
+                
+products_filtered 
+
+```
+There are no products with points less than 45 therefore all products can continue to be supplied.
+
+

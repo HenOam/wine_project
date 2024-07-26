@@ -64,7 +64,11 @@ any(is.na(data))
 ## Filtering required dataset to exclude NaN values
 
 ```{r}
-filtered_data <- filter(data, country!='NA' & points!='NA' & price!='NA' & province!='NA' & designation != 'NA') # we can exclude the rows with NaN
+# we can exclude the rows with NaN values
+
+filtered_data <- 
+  
+  filter(data, country!='NA' & points!='NA' & price!='NA' & province!='NA' & designation != 'NA') 
 
 ```
 
@@ -72,7 +76,9 @@ filtered_data <- filter(data, country!='NA' & points!='NA' & price!='NA' & provi
 
 ```{r}
 # select desired columns
-country_points <- filtered_data[c('country', 'points', 'price')] # we extract the columns of interest from the filtered data
+country_points <- 
+  
+  filtered_data[c('country', 'points', 'price')] 
 
 country_points
 ```
@@ -81,7 +87,11 @@ country_points
 ```{r}
 # plot a graph to see the distribution of the points for each country
 
-ggplot(country_points, aes(country, points)) + geom_boxplot() + theme_bw() + theme(plot.title = element_text(hjust = 0.5, colour = "steelblue", face = "bold"), axis.text.x = element_text(size = 8, colour = "black", angle = 40, vjust = 1, hjust = 1)) + labs(title = "Wine Points vs Country of production", x = "Country of production", y = "Points")
+ggplot(country_points, aes(country, points)) + 
+  geom_boxplot() + 
+  theme_bw() + 
+  theme(plot.title = element_text(hjust = 0.5, colour = "steelblue", face = "bold"), axis.text.x = element_text(size = 8, colour = "black", angle = 40, vjust = 1, hjust = 1)) + 
+  labs(title = "Wine Points vs Country of production", x = "Country of production", y = "Points")
 ```
 
 
@@ -89,19 +99,26 @@ ggplot(country_points, aes(country, points)) + geom_boxplot() + theme_bw() + the
 ```{r}
 # we group by country, select the rows having max points for each country and further filter based on the criteria for quality wine 
 
-quality_data <- country_points %>% group_by(country) %>% slice(which.max(points)) %>% filter(points >= 90) 
+quality_data <- 
+  country_points %>% group_by(country) %>% 
+  slice(which.max(points)) %>% 
+  filter(points >= 90) 
 
 quality_data
 ```
 ```{r}
-# we can plot the graph of the countries with the highest quality of wine
+# we can plot the graph of the maximum points from each countries
 
-ggplot(quality_data, aes(country, points, size = price)) + geom_point() + theme_bw() + theme(plot.title = element_text(hjust = 0.5, colour = "red", face = "bold"), axis.text.x = element_text(size = 10, colour = "black", angle = 40, vjust = 1, hjust = 1)) + labs(title = "Highest points vs Country of production", x = "Country of production", y = "Points")
+ggplot(quality_data, aes(country, points, size = price)) + 
+  geom_point() + 
+  theme_bw() + 
+  theme(plot.title = element_text(hjust = 0.5, colour = "red", face = "bold"), axis.text.x = element_text(size = 10, colour = "black", angle = 40, vjust = 1, hjust = 1)) + 
+  labs(title = "Highest points vs Country of production", x = "Country of production", y = "Points")
 ```
 
 
 ```{r}
-# data sorted in descending order to quickly see the countries with the highest points among the producers that meet the criteria
+# data sorted in descending order to easily see the countries with the highest points among the producers that meet the criteria
 
 ordered_max <- quality_data[order(-quality_data$points), ] 
 ```
@@ -110,12 +127,16 @@ Australia, France, Italy Portugal and US make the best quality wine.
 
 
 ```{r}
+# we install pacman package
+
 install.packages("pacman")
 ```
 
-we can present our data in a table
+
 ```{r}
-library(flextable)
+# we can present our data in a table
+
+library(flextable) # we use flextable package from pacman
 ```
 ```{r}
 flextable::flextable(ordered_max)
@@ -132,6 +153,8 @@ flextable::flextable(best_quality)
 
 
 ```{r}
+# any correlation between quality and price?
+
 cor(country_points$points, country_points$price) # The quality of wine shows some moderate correlation with the price but not a perfect relationship.
 ```
 

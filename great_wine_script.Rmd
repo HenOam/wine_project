@@ -12,7 +12,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 # The Great Wine Company
 
-Wine is all about people. We are a company run by wine people. We offer free UK delivery on orders over £500 and 10% off orders of 120+ bottles. We list over 130k wines from over 130 fabulous winemakers across the world in more than 44 countries. We know each of our producers personally. We want to continue to enjoy monopoly and expand into other countries where we are not yet dominant. We now require an analyst to help provide insight into our business. We would like to know which countries produce the finest quality wine (we rate high quality wine as wine with points equal or above 90). Which of our products is the most expensive and which producer makes this. Which products should we not supply anymore, with points less than 45. Please provide a report for the next meeting with the programme director, include some beautiful graphs 
+### Company overview: 
+Wine is all about people. We are a company run by wine people. We offer free UK delivery on orders over £500 and 10% off orders of 120+ bottles. We list over 130k wines from over 130 fabulous winemakers across the world in more than 44 countries. We know each of our producers personally. We want to continue to enjoy monopoly and expand into other countries where we are not yet dominant. 
+
+### Project scope: 
+We now require an analyst to help provide insight into our business. We would like to know which countries produce the finest quality wine (we rate high quality wine as wine with points equal or above 90). Which of our products is the most expensive and which producer makes this. Which products should we not supply anymore, with points less than 45. Please provide a report for the next meeting with the programme director, include some beautiful graphs 
 
 
 ## Loading necessary packages
@@ -28,11 +32,11 @@ library(readxl)
 
 ```{r}
 data <- read_csv("winemag-data-130k-v2.csv", na = "")
+
+data(head)
 ```
 
-```{r}
-view(data)
-```
+
 ## Exploring our data
 
 ```{r}
@@ -62,7 +66,6 @@ any(is.na(data))
 ```{r}
 filtered_data <- filter(data, country!='NA' & points!='NA' & price!='NA' & province!='NA' & designation != 'NA') # we can exclude the rows with NaN
 
-view(filtered_data)
 ```
 
 ### 1. To determine which country produced the finest quality wine based on points
@@ -92,6 +95,7 @@ quality_data
 ```
 ```{r}
 # we can plot the graph of the countries with the highest quality of wine
+
 ggplot(quality_data, aes(country, points, size = price)) + geom_point() + theme_bw() + theme(plot.title = element_text(hjust = 0.5, colour = "red", face = "bold"), axis.text.x = element_text(size = 10, colour = "black", angle = 40, vjust = 1, hjust = 1)) + labs(title = "Highest points vs Country of production", x = "Country of production", y = "Points")
 ```
 
@@ -152,7 +156,7 @@ products_filtered <-
   filtered_data [c('designation', 'points')] %>% 
   filter(points <= 45)
                 
-products_filtered 
+view(products_filtered)
 
 ```
 There are no products with points less than 45 therefore all products can continue to be supplied.
